@@ -28,7 +28,7 @@ class Api::BillboardsController < ApplicationController
 
   def destroy
     @billboard.destroy
-    render json: { message: 'List deleted' }
+    render json: { message: 'Billboard deleted' }
   end
 
   private

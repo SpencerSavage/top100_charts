@@ -1,8 +1,59 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import BillboardList from './BillboardList';
+import BillboardForm from './BillboardForm';
 
 const Billboards = () => {
-  return (
+  const [billboards, setBillboards] = useState([])
+
+  useEffect( () => {
+    axios.get('/api/billboards')
+      .then( res => {
+        setBillboards(res.data)
+      })
+      .catch( err => console.log(err) )
+  }, [])
+
+  const addBillboard = (billboard) => {
+    axios.post('/api/billboards', { billboard })
+      .then( res => {
+        setBillboards([...billboards, res.data ])
+      })
+      .catch( err => console.log(err) )
+    }
+
+  const updateBillboard = (id, billboard) => {
+    axios.put(`/api/billboards/${id}`, { billboard })
+    .then( res => {
+      const newUpdatedBillboards = billboards.map( bb => {
+        if (bb.id === id ) {
+          return res.data
+        }
+        return bb
+      })
+      setBillboards(newUpdatedBillboards)
+    })
+    .catch( err => console.log(err) )
+  }
+
+  const deleteBillboard = (id) => {
+    axios.delete(`/api/billboards/${id}`)
+      .then(res=> {
+        setBillboards(billboards.filter( bb => bb.id !== id ))
+        alert(res.data.message)
+      })
+      .catch( err => console.log(err) )
+  }
+
+  return(
     <>
       <h1>Billboards</h1>
+      <BillboardForm addBillboard={addBillboard} />
+      <BillboardList 
+        billboards={billboards}
+        updateBillboard={updateBillboard}
+        deleteBillboard={deleteBillboard}
+      />
     </>
   )
 }
